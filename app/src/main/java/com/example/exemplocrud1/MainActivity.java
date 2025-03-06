@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Aluno atualizado com sucesso!", Toast.LENGTH_SHORT).show();
         }
         // Fecha a tela de cadastro e volta para a listagem
-        finish();
+        irParaListar(view);
     }
 
 
