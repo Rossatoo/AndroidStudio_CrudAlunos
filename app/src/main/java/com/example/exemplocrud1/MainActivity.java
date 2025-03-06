@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText telefone;
     private AlunoDAO  dao;
 
+    private Aluno aluno = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
         telefone = findViewById(R.id.editTelefone);
 
         dao = new AlunoDAO(this);
+
+        Intent it = getIntent();
+        if(it.hasExtra("aluno")){
+            aluno = (Aluno) it.getSerializableExtra("aluno");
+            nome.setText(aluno.getNome().toString());
+            cpf.setText(aluno.getCpf().toString());
+            telefone.setText(aluno.getTelefone());
+        }
 
     }
 
@@ -52,9 +61,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (dao.cpfExistente(cpfDigitado)){
-            Toast.makeText(this, "CPF ja existe no banco de dados!", Toast.LENGTH_SHORT).show();
-            return;
+        if (aluno == null || !cpfDigitado.equals(aluno.getCpf())) {
+            if (dao.cpfExistente(cpfDigitado)) {
+                Toast.makeText(this, "CPF ja existe no banco de dados!", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         if (!dao.validaTelefone(telefoneDigitado)){
@@ -62,14 +73,32 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Aluno aluno = new Aluno();
-        aluno.setNome(nome.getText().toString());
-        aluno.setCpf(cpf.getText().toString());
-        aluno.setTelefone(telefone.getText().toString());
-        long id = dao.inserir(aluno); //inserir o aluno
-
-        Toast.makeText(this, "Aluno inserido com id: " + id, Toast.LENGTH_SHORT).show();
+        if (aluno == null) {
+            // Criar objeto Aluno
+            Aluno aluno = new Aluno();
+            aluno.setNome(nomeDigitado);
+            aluno.setCpf(cpfDigitado);
+            aluno.setTelefone(telefoneDigitado);
+            // Inserir aluno no banco de dados
+            long id = dao.inserir(aluno);
+            if (id != -1) {
+                Toast.makeText(this, "Aluno inserido com id: " + id, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Erro ao inserir aluno. Tente novamente.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            // Atualização de um aluno existente
+            aluno.setNome(nomeDigitado);
+            aluno.setCpf(cpfDigitado);
+            aluno.setTelefone(telefoneDigitado);
+            dao.atualizar(aluno);
+            Toast.makeText(this, "Aluno atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+        }
+        // Fecha a tela de cadastro e volta para a listagem
+        finish();
     }
+
 
     public void irParaListar(View view){
         Intent intent = new Intent(this, MainActivityListarAlunos.class);
