@@ -7,14 +7,12 @@ import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AlertDialogLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,7 @@ public class MainActivityListarAlunos extends AppCompatActivity {
 
         listView = findViewById(R.id.listaAlunos);
         registerForContextMenu(listView);
-        dao = new AlunoDAO(this);
+        dao = appDatabase.getInstance(this).alunoDaoRoom();
         alunos = dao.obterTodos();
         alunosFiltrados.addAll(alunos);
 
